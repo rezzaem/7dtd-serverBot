@@ -1,0 +1,134 @@
+{
+  "id": 975,
+  "parent_id": 0,
+  "status": "processing",
+  "currency": "IRT",
+  "version": "7.9.0",
+  "prices_include_tax": false,
+  "date_created": "2023-08-01T23:40:25",
+  "date_modified": "2023-08-01T23:40:25",
+  "discount_total": "0",
+  "discount_tax": "0",
+  "shipping_total": "0",
+  "shipping_tax": "0",
+  "cart_tax": "0",
+  "total": "0",
+  "total_tax": "0",
+  "customer_id": 27,
+  "order_key": "wc_order_RV5Z8sXZuGmjZ",
+  "billing": {
+    "first_name": "Reza",
+    "last_name": "emamhasani",
+    "company": "",
+    "address_1": "",
+    "address_2": "",
+    "city": "",
+    "state": "",
+    "postcode": "",
+    "country": "",
+    "email": "shash4@gmail.com",
+    "phone": "09016709358"
+  },
+  "shipping": {
+    "first_name": "",
+    "last_name": "",
+    "company": "",
+    "address_1": "",
+    "address_2": "",
+    "city": "",
+    "state": "",
+    "postcode": "",
+    "country": "",
+    "phone": ""
+  },
+  "payment_method": "",
+  "payment_method_title": "",
+  "transaction_id": "",
+  "customer_ip_address": "51.75.163.186",
+  "customer_user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+  "created_via": "checkout",
+  "customer_note": "",
+  "date_completed": null,
+  "date_paid": "2023-08-01T23:40:25",
+  "cart_hash": "c78dfdc37d32229468da804001d5c602",
+  "number": "975",
+  "meta_data": [
+    {
+      "id": 7086,
+      "key": "_billing_steamid",
+      "value": "13811382"
+    },
+    {
+      "id": 7087,
+      "key": "is_vat_exempt",
+      "value": "no"
+    },
+    {
+      "id": 7088,
+      "key": "billing_steamid",
+      "value": "13811382"
+    }
+  ],
+  "line_items": [
+    {
+      "id": 16,
+      "name": "\u062a\u0633\u062a \u0633\u0631\u0648\u0631",
+      "product_id": 809,
+      "variation_id": 0,
+      "quantity": 1,
+      "tax_class": "",
+      "subtotal": "0",
+      "subtotal_tax": "0",
+      "total": "0",
+      "total_tax": "0",
+      "taxes": [],
+      "meta_data": [
+        {
+          "id": 160,
+          "key": "_reduced_stock",
+          "value": "1",
+          "display_key": "_reduced_stock",
+          "display_value": "1"
+        }
+      ],
+      "sku": "server test",
+      "price": 0,
+      "image": {
+        "id": "",
+        "src": ""
+      },
+      "parent_name": null
+    }
+  ],
+  "tax_lines": [],
+  "shipping_lines": [],
+  "fee_lines": [],
+  "coupon_lines": [],
+  "refunds": [],
+  "payment_url": "https://teamlifo.ir/checkout/order-pay/975/?pay_for_order=true&key=wc_order_RV5Z8sXZuGmjZ",
+  "is_editable": false,
+  "needs_payment": false,
+  "needs_processing": true,
+  "date_created_gmt": "2023-08-01T20:10:25",
+  "date_modified_gmt": "2023-08-01T20:10:25",
+  "date_completed_gmt": null,
+  "date_paid_gmt": "2023-08-01T20:10:25",
+  "currency_symbol": "\u062a\u0648\u0645\u0627\u0646",
+  "_links": {
+    "self": [
+      {
+        "href": "https://teamlifo.ir/wp-json/wc/v3/orders/975"
+      }
+    ],
+    "collection": [
+      {
+        "href": "https://teamlifo.ir/wp-json/wc/v3/orders"
+      }
+    ],
+    "customer": [
+      {
+        "href": "https://teamlifo.ir/wp-json/wc/v3/customers/27"
+      }
+    ]
+  }
+}
