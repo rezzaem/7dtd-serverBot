@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<adminTools>
+  
+  <users>
+    
+    
+    <user platform="Steam" userid="76561198985690039" name="" permission_level="1000" />
+    <user platform="Steam" userid="76561198389857465" name="DarKShark" permission_level="1000" />
+  </users>
+  <whitelist>
+    
+    
+    
+    
+    
+    
+    <user platform="Steam" userid="76561198985690039" name="" />
+    <user platform="Steam" userid="76561198389857465" name="DarKShark" />
+    <user platform="Steam" userid="76561199190692535" name="Sniper Storm" />
+    <user platform="Steam" userid="76561199148502338" name="zobin" />
+    <user platform="Steam" userid="76561199104822742" name="aboli" />
+    <user platform="Steam" userid="76561199064783044" name="rasool" />
+    <user platform="Steam" userid="76561199151127079" name="radman" />
+    <user platform="Steam" userid="76561199104030433" name="kingmohsen" />
+    <user platform="Steam" userid="76561199250746260" name="soushians" />
+    <user platform="Steam" userid="76561199023949008" name="mahan" />
+    <user platform="Steam" userid="76561199098675878" name="Amin forouhar" />
+  <user platform="Steam" userid="76561199123456789" name="John Doe" /></whitelist>
+  <blacklist>
+    
+  </blacklist>
+  <commands>
+    
+    
+    
+    <permission cmd="chunkcache" permission_level="1000" />
+    <permission cmd="createwebuser" permission_level="1000" />
+    <permission cmd="debugshot" permission_level="1000" />
+    <permission cmd="debugweather" permission_level="1000" />
+    <permission cmd="decomgr" permission_level="1000" />
+    <permission cmd="getgamepref" permission_level="1000" />
+    <permission cmd="getgamestat" permission_level="1000" />
+    <permission cmd="getlogpath" permission_level="1000" />
+    <permission cmd="getoptions" permission_level="1000" />
+    <permission cmd="gettime" permission_level="1000" />
+    <permission cmd="gfx" permission_level="1000" />
+    <permission cmd="graph" permission_level="1000" />
+    <permission cmd="help" permission_level="1000" />
+    <permission cmd="listplayerids" permission_level="1000" />
+    <permission cmd="listthreads" permission_level="1000" />
+    <permission cmd="memcl" permission_level="1000" />
+    <permission cmd="settempunit" permission_level="1000" />
+    <permission cmd="cm" permission_level="1000" />
+    <permission cmd="dm" permission_level="1000" />
+    <permission cmd="tp" permission_level="1000" />
+    <permission cmd="st" permission_level="1000" />
+  </commands>
+</adminTools>
