@@ -1,26 +1,14 @@
 [
     {
-        "client_id": 1,
+        "steam_id": 0,
         "product_id": 809,
-        "name": "John Doe",
-        "date_added": "2023-08-03 00:34:01"
+        "order_number": 1002,
+        "add_time": "2023-08-03 00:34:01"
     },
     {
-        "client_id": 1,
+        "steam_id": "1231212312",
         "product_id": 809,
-        "name": "John Doe2",
-        "date_added": "2023-08-03 00:36:52"
-    },
-    {
-        "client_id": 1,
-        "product_id": 809,
-        "name": "John Doe2",
-        "date_added": "2023-08-03 00:38:35"
-    },
-    {
-        "client_id": 1,
-        "product_id": 809,
-        "name": "John Doe2",
-        "date_added": "2023-08-03 00:40:48"
+        "order_number": 1005,
+        "add_time": "2023-08-01 18:14:31"
     }
 ]

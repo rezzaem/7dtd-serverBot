@@ -2,6 +2,8 @@ import json
 import datetime
 import xml.etree.ElementTree as ET
 
+#attetion : this is for just plan 24 h and plan 30 days , should edit for other times
+
 def remove_user_from_whitelist(user_id):
     # Parse the serveradmin.xml file and get the root element
     serveradmin='serveradmin.xml' # server admin location
@@ -35,14 +37,15 @@ try:
 
     for client in data:
         # check for test server clients (24 h)
-        if client.get('product_id') =='975':
-            added_datetime = datetime.datetime.strptime(client.get('date_added'), '%Y-%m-%d %H:%M:%S')
+        if client.get('product_id') ==809:
+            added_datetime = datetime.datetime.strptime(client.get('add_time'), '%Y-%m-%d %H:%M:%S')
             time_spent = current_datetime - added_datetime
 
             if time_spent.total_seconds() >= 24 * 60 * 60: # for 24 hour
                 remove_user_from_whitelist(client.get('steam_id'))
-        else:
-            added_datetime = datetime.datetime.strptime(client.get('date_added'), '%Y-%m-%d %H:%M:%S')
+                
+        else: # else default is 30 days 
+            added_datetime = datetime.datetime.strptime(client.get('add_time'), '%Y-%m-%d %H:%M:%S')
             time_spent = current_datetime - added_datetime
 
             if time_spent.total_seconds() >= 30 * 24 * 60 * 60: # for 30 days

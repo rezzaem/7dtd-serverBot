@@ -10,7 +10,7 @@ def save_client(j_data):
     steam_id = None
     product_id = None
     order_number = None
-    add_time = int(time.time())
+    add_time = None
 
     # Find items in received JSON from WordPress
     for item in j_data["meta_data"]:
@@ -42,12 +42,20 @@ def save_client(j_data):
         "order_number": order_number,
         "add_time": add_time
     }
-
-    person_info_list.append(person_info)
-    add_to_server(steam_id)
+    check_for_rejister_before=False
+    # check if client has buyed free plan it hsould can not save 24 h again
+    if order_number==809: #0rder number 809 in our wordpress beking to 24h free plan
+        for person in person_info_list:
+            if person.get("steam_id")==person_info.get("steam_id"):
+                check_for_rejister_before=True
+    if check_for_rejister_before==False:
+        person_info_list.append(person_info)
+        add_to_server(steam_id)
     # Save
-    with open("clients_data.json", "w") as file:
-        json.dump(person_info_list, file,indent=4)
+        with open("clients_data.json", "w") as file:
+            json.dump(person_info_list, file,indent=4)
+    else:
+        print("person is already buyed server test")
 
 
 def add_to_server(steam_id):

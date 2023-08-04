@@ -16,8 +16,8 @@
     <user platform="Steam" userid="76561199250746260" name="soushians" />
     <user platform="Steam" userid="76561199023949008" name="mahan" />
     <user platform="Steam" userid="76561199098675878" name="Amin forouhar" />
-    <user platform="Steam" userid="1231212312" name="" />
-  </whitelist>
+    <user platform="Steam" userid="1" name="" />
+    </whitelist>
   <blacklist>
     
   </blacklist>
