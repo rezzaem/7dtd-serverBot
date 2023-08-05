@@ -35,6 +35,12 @@ def save_client(j_data):
     except FileNotFoundError:
         person_info_list = []
 
+    try:
+        with open ('809-limit-list.json','r') as f:
+            limit=f.read()
+    except FileNotFoundError:
+            limit=[]
+
     # Make client
     person_info = {
         "steam_id": steam_id,
@@ -42,20 +48,51 @@ def save_client(j_data):
         "order_number": order_number,
         "add_time": add_time
     }
-    check_for_rejister_before=False
-    # check if client has buyed free plan it hsould can not save 24 h again
-    if order_number==809: #0rder number 809 in our wordpress beking to 24h free plan
-        for person in person_info_list:
-            if person.get("steam_id")==person_info.get("steam_id"):
-                check_for_rejister_before=True
-    if check_for_rejister_before==False:
-        person_info_list.append(person_info)
-        add_to_server(steam_id)
-    # Save
-        with open("clients_data.json", "w") as file:
+    # check if client has buyed free plan it hsould can not save 24 h again-every 809 products should save in 809 blok list
+    
+    
+    if order_number==809 and person.get("steam_id") not in limit: # for 24 h clients
+        for person in person_info_list: # has rejistered before but not 809
+             if steam_id==person_info.get("steam_id"):
+                 client_time=person.get('add_time') +datetime.timedelta(hours=24) # add 24 hour to client if not buy free test yet
+                 person['add_time']=client_time
+                 break
+        else: # has not rejistered yet
+            person_info_list.append(person_info)
+            add_to_server(steam_id)
+        limit.append(steam_id)
+        print(f'client with steam id {steam_id} for 24h has been saved')
+
+    elif order_number!=809 :
+        for person in person_info_list: # has rejistered before but not 809
+             if steam_id==person_info.get("steam_id"):
+                 client_time=person.get('add_time') +datetime.timedelta(days=30) # add 24 hour to client if not buy free test yet
+                 person['add_time']=client_time
+                 break
+        else:
+            person_info_list.append(person_info)
+            add_to_server(steam_id)
+        print(f'client with steam id {steam_id} for 30 days has been saved')
+
+                      
+    with open("clients_data.json", "w") as file:
             json.dump(person_info_list, file,indent=4)
-    else:
-        print("person is already buyed server test")
+
+    with open ('809-limit-list.json','w') as f:
+        json.dump(limit,f,indent=1)
+
+    # elif order_number!=809: #for others
+    #     person_info_list.append(person_info)
+
+    # if order_number==809 : #0rder number 809 in our wordpress beking to 24h free plan
+    #     for person in person_info_list:
+    #         if person.get("steam_id")==person_info.get("steam_id"):
+    #             check_for_rejister_before=True
+    # if check_for_rejister_before==False:
+    #     person_info_list.append(person_info)
+    #     add_to_server(steam_id)
+    # Save
+        
 
 
 def add_to_server(steam_id):
@@ -86,6 +123,7 @@ def add_to_server(steam_id):
     # Save the updated XML tree to the file with proper indentation
     ET.indent(root)
     tree.write("serveradmin.xml", encoding="utf-8", xml_declaration=True)
+    print(f'client with steam id {steam_id} now can join to Server')
 #-------------------------
 
 app = Flask(__name__)
