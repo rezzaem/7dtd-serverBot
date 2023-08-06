@@ -3,6 +3,9 @@ from flask import Flask, request, jsonify, abort
 import time
 import xml.etree.ElementTree as ET
 import datetime
+import schedule
+import threading
+import signal
 
 #--------------------------
 def save_client(j_data):
@@ -10,7 +13,7 @@ def save_client(j_data):
     steam_id = None
     product_id = None
     order_number = None
-    add_time = None
+    exp_time = None
 
     # Find items in received JSON from WordPress
     for item in j_data["meta_data"]:
@@ -21,8 +24,7 @@ def save_client(j_data):
         product_id = item["product_id"]
         break
     order_number = j_data['id']
-    current_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    add_time= current_datetime
+    
 
     # Open client list data JSON
     try:
@@ -35,9 +37,13 @@ def save_client(j_data):
     except FileNotFoundError:
         person_info_list = []
 
-    try:
+    try: #opeen limit list
         with open ('809-limit-list.json','r') as f:
-            limit=f.read()
+            limits=f.read()
+            if limits:
+                limit = json.loads(limits)
+            else:
+                limit = []
     except FileNotFoundError:
             limit=[]
 
@@ -46,30 +52,44 @@ def save_client(j_data):
         "steam_id": steam_id,
         "product_id": product_id,
         "order_number": order_number,
-        "add_time": add_time
+        "exp_time": exp_time,
+        "status":"active"
     }
+
+
     # check if client has buyed free plan it hsould can not save 24 h again-every 809 products should save in 809 blok list
-    
-    
-    if order_number==809 and person.get("steam_id") not in limit: # for 24 h clients
+    if product_id==809 and steam_id not in limit: # for 24 h clients
         for person in person_info_list: # has rejistered before but not 809
-             if steam_id==person_info.get("steam_id"):
-                 client_time=person.get('add_time') +datetime.timedelta(hours=24) # add 24 hour to client if not buy free test yet
-                 person['add_time']=client_time
-                 break
+             if steam_id==person.get("steam_id"):
+                old_exp_time= datetime.datetime.strptime(person.get('exp_time'),'%Y-%m-%d %H:%M:%S')
+                new_exp_time=(old_exp_time+datetime.timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S") # add 24 hour to client if not buy free test yet
+                person['exp_time']=new_exp_time
+                if person.get["status"]=="deactive":
+                    person["status"]=="active"
+                break
         else: # has not rejistered yet
+            new_exp_time = (datetime.datetime.now()+datetime.timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+            person_info["exp_time"]=new_exp_time
             person_info_list.append(person_info)
             add_to_server(steam_id)
+
         limit.append(steam_id)
         print(f'client with steam id {steam_id} for 24h has been saved')
 
-    elif order_number!=809 :
+    # only posible for save is that the product is not free
+
+    elif product_id!=809 : # paid products (30 days time)
         for person in person_info_list: # has rejistered before but not 809
-             if steam_id==person_info.get("steam_id"):
-                 client_time=person.get('add_time') +datetime.timedelta(days=30) # add 24 hour to client if not buy free test yet
-                 person['add_time']=client_time
-                 break
-        else:
+             if steam_id==person.get("steam_id"):
+                old_exp_time= datetime.datetime.strptime(person.get('exp_time'),'%Y-%m-%d %H:%M:%S')
+                new_exp_time=(old_exp_time+datetime.timedelta(days=24)).strftime("%Y-%m-%d %H:%M:%S") # add 30 days  to client
+                person['exp_time']=new_exp_time
+                if person.get["status"]=="deactive":
+                    person["status"]=="active"
+                break
+        else: #has not rejistered
+            new_exp_time = (datetime.datetime.now()+datetime.timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+            person_info["exp_time"]=new_exp_time
             person_info_list.append(person_info)
             add_to_server(steam_id)
         print(f'client with steam id {steam_id} for 30 days has been saved')
@@ -124,6 +144,59 @@ def add_to_server(steam_id):
     ET.indent(root)
     tree.write("serveradmin.xml", encoding="utf-8", xml_declaration=True)
     print(f'client with steam id {steam_id} now can join to Server')
+
+def remove_user_from_whitelist(user_id):
+    # Parse the serveradmin.xml file and get the root element
+    serveradmin='serveradmin.xml' # server admin location
+    tree = ET.parse(serveradmin)
+    root = tree.getroot()
+
+    # Find the <whitelist> element
+    whitelist_element = root.find('.//whitelist')
+    if whitelist_element is not None:
+        # Find the specific user element with the matching userid
+        user_element = whitelist_element.find(f".//user[@userid='{user_id}']")
+        if user_element is not None:
+            # Remove the user element from the <whitelist> section
+            whitelist_element.remove(user_element)
+            print(f"Removed user with userid='{user_id}' from the whitelist.")
+
+            # Save the modified XML back to the serveradmin.xml file
+            tree.write('serveradmin.xml', encoding='utf-8', xml_declaration=True)
+        else:
+            print(f"User with userid='{user_id}' not found in the whitelist.")
+    else:
+        print("The <whitelist> section not found in serveradmin.xml.")
+
+def client_remover():
+    print('start client remover now')
+    try:
+    # open clients data list
+        with open ('clients_data.json','r')as f:
+            data=json.load(f)
+        #save today (current) time
+        current_datetime = datetime.datetime.now()
+
+        for client in data:
+            # check for test server clients (24 h)
+            if client.get('product_id') ==809 and client.get("status")=="active":
+                expire = datetime.datetime.strptime(client.get('exp_time'), '%Y-%m-%d %H:%M:%S')
+
+                if current_datetime > expire:
+                    remove_user_from_whitelist(client.get('steam_id'))
+                    client["status"]="deactive"
+                    
+            elif client.get("status")=="active": # else default is 30 days 
+                expire = datetime.datetime.strptime(client.get('exp_time'), '%Y-%m-%d %H:%M:%S')
+                
+                if current_datetime > expire: # for 30 days
+                    remove_user_from_whitelist(client.get('steam_id'))
+                    client["status"]="deactive"
+
+    except FileNotFoundError:
+        print("clients_data file not found near py app")
+
+
 #-------------------------
 
 app = Flask(__name__)
@@ -141,5 +214,25 @@ def webhook_receiver():
 
     return "Webhook received!"
 
+# def run_flask():
+#     # Ignore the SIGTERM signal
+#     signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    
+
 if __name__ == "__main__":
+    # Ignore the SIGTERM signal
+    import signal
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+
+    def job_thread():
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    threading.Thread(target=job_thread).start()
+
+    schedule.every(10).seconds.do(client_remover)
+
     app.run(debug=True)
+
+   
+    

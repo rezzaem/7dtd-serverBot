@@ -25,7 +25,7 @@ new_client = {
     # Add other client data as needed
 }
 
-add_client(new_client)
+# add_client(new_client)
 
 def check_clients_data():
     with open('clients_data.json', 'r') as f:
@@ -45,4 +45,8 @@ def check_clients_data():
                 print ("yes")  # Replace "pass" with your function call
             else:
                 print("no")
-check_clients_data()
+# check_clients_data()
+exp_time=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+print(exp_time)
+exp_time= (datetime.datetime.now()+datetime.timedelta(hours=24)).strftime('%Y-%m-%d %H:%M:%S')
+print(exp_time)
