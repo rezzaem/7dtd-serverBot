@@ -230,10 +230,10 @@ if __name__ == "__main__":
     def job_thread():
         while True:
             schedule.run_pending()
-            time.sleep(1)
+            time.sleep(60)
     threading.Thread(target=job_thread).start()
 
-    schedule.every(3).seconds.do(client_remover)
+    schedule.every(30).minutes.do(client_remover)
 
     app.run(debug=True)
 
