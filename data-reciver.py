@@ -169,7 +169,7 @@ def remove_user_from_whitelist(user_id):
         print("The <whitelist> section not found in serveradmin.xml.")
 
 def client_remover():
-    print('start client remover now')
+    print('start client checker for remove')
     try:
     # open clients data list
         with open ('clients_data.json','r')as f:
@@ -192,6 +192,9 @@ def client_remover():
                 if current_datetime > expire: # for 30 days
                     remove_user_from_whitelist(client.get('steam_id'))
                     client["status"]="deactive"
+
+        with open ('clients_data.json','w')as f:
+            json.dump(data,f,indent=4)
 
     except FileNotFoundError:
         print("clients_data file not found near py app")
@@ -230,7 +233,7 @@ if __name__ == "__main__":
             time.sleep(1)
     threading.Thread(target=job_thread).start()
 
-    schedule.every(10).seconds.do(client_remover)
+    schedule.every(3).seconds.do(client_remover)
 
     app.run(debug=True)
 
