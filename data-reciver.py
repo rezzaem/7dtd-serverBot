@@ -6,10 +6,40 @@ import datetime
 import schedule
 import threading
 import signal
+from woocommerce import API
 
-#--------------------------
+#----------------------------------------------------------     
+def send_complete(order_number,status):
+    try:
+        wcapi = API(
+        url="http://teamlifo.ir",
+        consumer_key="ck_52e407c4f76f5d542f856ddd93d95fd81e51023c",
+        consumer_secret="cs_ab6471bfe28c378648b77491374a33c4e2027562",
+        version="wc/v3",
+        timeout=60
+        )
+        order_id = order_number
+        new_status = "completed"
+
+        # Prepare the data payload
+        data = {
+            "status": status
+        }
+
+        # Update the order status using the API
+        response = wcapi.put(f"orders/{order_id}", data)
+
+        # Print the response
+        if '200' in response:
+            return True
+        else:
+            return False
+    except:
+        print(KeyError)
+#-------------------------------- 
 def save_client(j_data):
     # Define variables
+    accept_email=None
     steam_id = None
     product_id = None
     order_number = None
@@ -75,6 +105,8 @@ def save_client(j_data):
 
         limit.append(steam_id)
         print(f'client with steam id {steam_id} for 24h has been saved')
+        accept_email=True
+        
 
     # only posible for save is that the product is not free
 
@@ -93,6 +125,9 @@ def save_client(j_data):
             person_info_list.append(person_info)
             add_to_server(steam_id)
         print(f'client with steam id {steam_id} for 30 days has been saved')
+        accept_email=True
+    if product_id==809 and steam_id  in limit:
+        accept_email=False 
 
                       
     with open("clients_data.json", "w") as file:
@@ -100,51 +135,46 @@ def save_client(j_data):
 
     with open ('809-limit-list.json','w') as f:
         json.dump(limit,f,indent=1)
-
-    # elif order_number!=809: #for others
-    #     person_info_list.append(person_info)
-
-    # if order_number==809 : #0rder number 809 in our wordpress beking to 24h free plan
-    #     for person in person_info_list:
-    #         if person.get("steam_id")==person_info.get("steam_id"):
-    #             check_for_rejister_before=True
-    # if check_for_rejister_before==False:
-    #     person_info_list.append(person_info)
-    #     add_to_server(steam_id)
-    # Save
-        
-
-
-def add_to_server(steam_id):
-    # Parse the XML file
-    server_admin_location='serveradmin.xml' # edit to location of serveradmin
-    tree = ET.parse(server_admin_location)
-    root = tree.getroot()
-
-    # Create a new user element
-    new_user = ET.Element("user")
-    new_user.set("platform", "Steam")
-    new_user.set("userid", str(steam_id))  # Replace with the actual SteamID64 of the user
-    new_user.set("name", "")  # Optional: Replace with the name of the user
-
-    whitelist_section = root.find(".//whitelist")
-
-    # Find the last user element in the <whitelist> section
-    last_user = whitelist_section.find("user[last()]")
-
-    # Check if the last user element exists and insert the new user after it
-    if last_user is not None:
-        index = list(whitelist_section).index(last_user) + 1
-        whitelist_section.insert(index, new_user)
+    if accept_email==True:
+        return True,order_number
     else:
-        # If no user element exists in the <whitelist> section, append the new user
-        whitelist_section.append(new_user)
+        return False,order_number
+#--------------------------------     
+def add_to_server(steam_id):
+    try :
+        # Parse the XML file
+        server_admin_location='serveradmin.xml' # edit to location of serveradmin
+        tree = ET.parse(server_admin_location)
+        root = tree.getroot()
 
-    # Save the updated XML tree to the file with proper indentation
-    ET.indent(root)
-    tree.write("serveradmin.xml", encoding="utf-8", xml_declaration=True)
-    print(f'client with steam id {steam_id} now can join to Server')
+        # Create a new user element
+        new_user = ET.Element("user")
+        new_user.set("platform", "Steam")
+        new_user.set("userid", str(steam_id))  # Replace with the actual SteamID64 of the user
+        new_user.set("name", "")  # Optional: Replace with the name of the user
 
+        whitelist_section = root.find(".//whitelist")
+
+        # Find the last user element in the <whitelist> section
+        last_user = whitelist_section.find("user[last()]")
+
+        # Check if the last user element exists and insert the new user after it
+        if last_user is not None:
+            index = list(whitelist_section).index(last_user) + 1
+            whitelist_section.insert(index, new_user)
+        else:
+            # If no user element exists in the <whitelist> section, append the new user
+            whitelist_section.append(new_user)
+
+        # Save the updated XML tree to the file with proper indentation
+        ET.indent(root)
+        tree.write("serveradmin.xml", encoding="utf-8", xml_declaration=True)
+        print(f'client with steam id {steam_id} now can join to Server')
+        return True
+    except:
+        print(KeyError)
+        return False   
+#-------------------------------- 
 def remove_user_from_whitelist(user_id):
     # Parse the serveradmin.xml file and get the root element
     serveradmin='serveradmin.xml' # server admin location
@@ -167,7 +197,7 @@ def remove_user_from_whitelist(user_id):
             print(f"User with userid='{user_id}' not found in the whitelist.")
     else:
         print("The <whitelist> section not found in serveradmin.xml.")
-
+#-------------------------------- 
 def client_remover():
     print('start client checker for remove')
     try:
@@ -198,9 +228,9 @@ def client_remover():
 
     except FileNotFoundError:
         print("clients_data file not found near py app")
+#-------------------------------- 
 
-
-#-------------------------
+#---------------------------------------------------------     
 
 app = Flask(__name__)
 
@@ -213,14 +243,24 @@ def webhook_receiver():
     """
     json_data = request.get_json()
 
-    save_client(json_data)
+    order=save_client(json_data)
+    if order[0]==True:
+        for i in range(5):
+            check_for_send=send_complete(order[1],"completed")
+            if check_for_send==True:
+                print(f'email for order {order[1]} send')
+                break
+    else:
+        for i in range(5):
+            check_for_send=send_complete(order[1],"refunded")
+            if check_for_send==True:
+                print(f'email for order {order[1]} send')
+                break
+
 
     return "Webhook received!"
 
-# def run_flask():
-#     # Ignore the SIGTERM signal
-#     signal.signal(signal.SIGTERM, signal.SIG_IGN)
-    
+
 
 if __name__ == "__main__":
     # Ignore the SIGTERM signal

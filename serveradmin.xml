@@ -20,7 +20,9 @@
     <user platform="Steam" userid="123456789" name="" />
     <user platform="Steam" userid="12345678910" name="" />
     <user platform="Steam" userid="12345678911" name="" />
-    </whitelist>
+    <user platform="Steam" userid="33212131332" name="" />
+    <user platform="Steam" userid="332121313323" name="" />
+  </whitelist>
   <blacklist>
     
   </blacklist>
